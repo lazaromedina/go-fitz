@@ -192,8 +192,11 @@ func (f *Document) Image(pageNumber int) (*image.RGBA, error) {
 	return f.ImageDPI(pageNumber, 300.0)
 }
 
+var globalMu sync.Mutex
+
 // ImageDPI returns image for given page number and DPI.
 func (f *Document) ImageDPI(pageNumber int, dpi float64) (*image.RGBA, error) {
+	// Bloquea el mutex local del documento
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
@@ -227,11 +230,17 @@ func (f *Document) ImageDPI(pageNumber int, dpi float64) (*image.RGBA, error) {
 	defer C.fz_drop_pixmap(f.ctx, pixmap)
 
 	device := C.fz_new_draw_device(f.ctx, ctm, pixmap)
-	C.fz_enable_device_hints(f.ctx, device, C.FZ_NO_CACHE)
+	if device == nil {
+		return nil, ErrCreateDevice
+	}
 	defer C.fz_drop_device(f.ctx, device)
 
 	drawMatrix := C.fz_identity
+
+	// Bloqueo sincronizado para ejecutar el contenido de la página
+	globalMu.Lock()
 	ret := C.run_page_contents(f.ctx, page, device, drawMatrix, nil)
+	globalMu.Unlock()
 	if ret == 0 {
 		return nil, ErrRunPageContents
 	}

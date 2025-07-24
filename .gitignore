@@ -1,0 +1,18 @@
+# Archivos binarios
+*.exe
+*.exe~
+*.out
+*.log
+
+# Archivos del editor
+*.swp
+*.swo
+.idea/
+.vscode/
+vendor/
+bin/
+.DS_Store
+*.env
+*.txt
+*.mk
+.run

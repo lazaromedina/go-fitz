@@ -21,6 +21,7 @@ var (
 	ErrPixmapSamples   = errors.New("fitz: cannot get pixmap samples")
 	ErrNeedsPassword   = errors.New("fitz: document needs password")
 	ErrLoadOutline     = errors.New("fitz: cannot load outline")
+	ErrCreateDevice    = errors.New("fitz: cannot create device")
 )
 
 // MaxStore is maximum size in bytes of the resource store, before it will start evicting cached resources such as fonts and images.
